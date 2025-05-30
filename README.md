@@ -10,7 +10,7 @@ In the project directory, you can run:
 
 Runs the app in the development mode.\
 Open [cricket-live-score-rosy.vercel.app](https://cricket-live-score-rosy.vercel.app/) to view it in your browser.\
-### Just sign in with any Fake/MadeUp mail to Enter(Dont click the Google SignIn option).
+### Just Register & then Sign in with any Fake/MadeUp mail to Enter(Dont click the Google SignIn option).
 
 ## To check the LiveScore 
 Open https://cricket-live-score-rosy.vercel.app/livescore/FirstBattingTeamNamevsSecondBattingTeamName  (Edit the Team Names)
