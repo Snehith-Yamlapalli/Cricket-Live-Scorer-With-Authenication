@@ -62,7 +62,7 @@ export default function Scorecard() {
   }
   useEffect(() => {
   if (innings === 2 && teamruns > targetruns + 1) {
-    alert('going to over');
+    alert('Match Finished');
     navigate('/Over', { state: { hostteam, visitteam } });
   }
 }, [innings, teamruns, targetruns, hostteam, visitteam, navigate]);
@@ -75,14 +75,6 @@ export default function Scorecard() {
         settargetruns(runs)
       })
       .catch(err => console.error(err))
-
-    // if (innings === 2 && teamruns > targetruns + 1) 
-    //   {
-    //   const newteamruns = teamruns + 1
-    //   setteamruns(newteamruns)
-    //   alert('going to over')
-    //   navigate('/Over', { state: { hostteam, visitteam } });
-    // }
     firebaserealtimedb.ref(`${matchid}/${Key}/batsmen/${striker}`)
       .once('value')
       .then(snap => {
