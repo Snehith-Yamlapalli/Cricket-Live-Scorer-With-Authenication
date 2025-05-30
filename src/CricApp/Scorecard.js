@@ -238,7 +238,7 @@ export default function Scorecard() {
 
 
     // cpnting runs
-    if (selected.includes('LB') || selected.includes('NB') || selected.includes('W')) runcount = true
+    if (selected.includes('NB') || selected.includes('W')) runcount = true
     sethisover(prev => [...prev, `${runs}${[...selected].join('')}`]);
     const updates = {
       [`${Key}/Totalteamruns`]: teamruns + val,
