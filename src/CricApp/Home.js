@@ -17,7 +17,7 @@ export default function Home() {
 
   function Startmatch() 
   {
-    const parsedOver = parseInt(overs, 20);
+    const parsedOver = parseInt(overs, 10);
     if (parsedOver < 1 || parsedOver > 20) {
       alert('Number of overs must be between 1 and 20');
       return;
