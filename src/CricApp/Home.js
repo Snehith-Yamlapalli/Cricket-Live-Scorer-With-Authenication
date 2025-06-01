@@ -78,7 +78,7 @@ export default function Home() {
           )}
 
           <h2 className="mt-3">Overs</h2>
-          <input type="number" placeholder="1–10" className="form-control col-md-2" value={overs} onChange={e => setOvers(e.target.value)} min="1" max="20" />
+          <input type="number" placeholder="1–20" className="form-control col-md-2" value={overs} onChange={e => setOvers(e.target.value)} min="1" max="20" />
 
           <button className="btn btn-primary btn-lg mt-4" onClick={Startmatch} disabled={!hostteam || !visitteam || !overs || !tossWinner || !tossDecision}>
             Start Match
