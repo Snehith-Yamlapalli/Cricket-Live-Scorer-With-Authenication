@@ -17,9 +17,9 @@ export default function Home() {
 
   function Startmatch() 
   {
-    const parsedOver = parseInt(overs, 10);
-    if (parsedOver < 1 || parsedOver > 10) {
-      alert('Number of overs must be between 1 and 10');
+    const parsedOver = parseInt(overs, 20);
+    if (parsedOver < 1 || parsedOver > 20) {
+      alert('Number of overs must be between 1 and 20');
       return;
     }
     const firstBattingTeam  = tossDecision === 'Batting'
@@ -78,7 +78,7 @@ export default function Home() {
           )}
 
           <h2 className="mt-3">Overs</h2>
-          <input type="number" placeholder="1–10" className="form-control col-md-2" value={overs} onChange={e => setOvers(e.target.value)} min="1" max="10" />
+          <input type="number" placeholder="1–10" className="form-control col-md-2" value={overs} onChange={e => setOvers(e.target.value)} min="1" max="20" />
 
           <button className="btn btn-primary btn-lg mt-4" onClick={Startmatch} disabled={!hostteam || !visitteam || !overs || !tossWinner || !tossDecision}>
             Start Match
