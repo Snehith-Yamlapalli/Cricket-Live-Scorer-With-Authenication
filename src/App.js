@@ -31,7 +31,7 @@ function App() {
     <div className="App">
       <Router>
         <Routes>
-          <Route path="/" element={user ? <Navigate to='/Home' /> : <Login />} />
+          <Route path="/" element={user ? <Navigate to='/Profile' /> : <Login />} />
           <Route path='/Register' element={<Register />}></Route>
           <Route path='/Profile' element={<Profile />}></Route>
           <Route element={<ProfileLayout />}>
