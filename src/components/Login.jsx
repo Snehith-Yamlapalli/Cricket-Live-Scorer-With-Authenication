@@ -12,7 +12,7 @@ const Login = () => {
         try{
             await signInWithEmailAndPassword(auth,Email,passowrd);
             alert('User logged in successfully')
-            window.location.href = './Home'
+            window.location.href = './Profile'
         } catch(error){
             alert(error)
         }
