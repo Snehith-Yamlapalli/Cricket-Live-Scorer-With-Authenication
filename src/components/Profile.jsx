@@ -1,6 +1,6 @@
 import  { useEffect, useState } from 'react'
 import { auth } from './firebase'
-
+import Home from '../CricApp/Home'
 const Profile = () => {
     const [userDetails, setUserdetails] = useState(null)
 
@@ -34,6 +34,7 @@ const Profile = () => {
                         <h1>Cric App</h1>
                         <button className="btn btn-primary" onClick={logout} style={{marginLeft:'350px'}}>Logout </button>
                     </div>
+                    <Home/>
                 </>
             ) : (
                 <p>Loading....</p>
