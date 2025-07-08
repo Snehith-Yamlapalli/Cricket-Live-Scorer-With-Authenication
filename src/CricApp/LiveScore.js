@@ -127,7 +127,7 @@ export default function LiveScore() {
     <div className="col-12 col-md-3">
       <h2 className="mb-1">Bowler</h2>
       <h3>
-        {Current.bowler} – {bowlerruns} wkts – {bowlerover}.{bowlerballs} overs
+        {Current.bowler} – {bowlerruns}-{bowlerover}.{bowlerballs}-{bowlerwickets}
       </h3>
     </div>
   </div>
