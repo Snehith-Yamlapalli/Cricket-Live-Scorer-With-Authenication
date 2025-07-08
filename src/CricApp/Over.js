@@ -42,7 +42,7 @@ export default function Over() {
   }
   function scores()
   {
-     navigate(`/livescore/${matchid}`)
+     navigate(`/livescoreCard/${matchid}`)
   }
   function GotoHome()
   {
