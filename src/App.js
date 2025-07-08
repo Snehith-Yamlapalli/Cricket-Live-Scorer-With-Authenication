@@ -14,9 +14,9 @@ import Scorecard from './CricApp/Scorecard';
 import NewBatsman from './CricApp/NewBatsman';
 import NewBowler from './CricApp/NewBowler';
 import Over from './CricApp/Over';
-import History from './CricApp/History';
 import NBB from './CricApp/NBB';
 import LiveScore from './CricApp/LiveScore';
+import LiveScoreCard from './CricApp/LiveScoreCard';
 
 function App() {
   const [user, setUser] = useState(null);
@@ -50,6 +50,7 @@ function App() {
               <Route path="/NewBowler" element={<NewBowler />} />
               <Route path="/NewBatsman" element={<NewBatsman />} />
               <Route path="/livescore/:matchId" element={<LiveScore />} />
+              <Route path="/livescoreCard/:matchId" element={<LiveScoreCard />} />
             </Route>
           )}
 
