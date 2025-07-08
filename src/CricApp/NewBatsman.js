@@ -13,13 +13,13 @@ export default function NewBatsman() {
   function Startmatch() {
     if (tag) 
     {
-      thisover.push(`${runs}${[...selected].join('')}`);
-      
       const stcandidate = newstriker?.trim();
-      if (!newstriker?.trim()) {
+      if (!newstriker?.trim()) 
+      {
         alert('Please enter the new striker name');
         return;
       }
+       thisover.push(`${runs}${[...selected].join('')}`);
       navigate('/scorecard', {
         state: { innings, hostteam, visitteam, overs, striker: stcandidate, nonstriker, bowler, tag: tag, bowlerballs: newBowlerBalls, teamruns: newteamruns,thisover }
       });
