@@ -1,9 +1,6 @@
 import { React, useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import firebase from './firebase';
-import Checkbox from '@mui/material/Checkbox';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Stack from '@mui/material/Stack';
 import { auth } from '../components/firebase';
 
 export default function Scorecard() {
@@ -61,11 +58,11 @@ export default function Scorecard() {
     settag(prev => !prev)
   }
   useEffect(() => {
-  if (innings === 2 && teamruns > targetruns + 1) {
-    alert('Match Finished');
-    navigate('/Over', { state: { hostteam, visitteam } });
-  }
-}, [innings, teamruns, targetruns, hostteam, visitteam, navigate]);
+    if (innings === 2 && teamruns > targetruns + 1) {
+      alert('Match Finished');
+      navigate('/Over', { state: { hostteam, visitteam } });
+    }
+  }, [innings, teamruns, targetruns, hostteam, visitteam, navigate]);
   useEffect(() => {
     firebaserealtimedb
       .ref(`${matchid}/${'Innings1'}/Totalteamruns`)
@@ -160,19 +157,32 @@ export default function Scorecard() {
         [`${Key}/Totalteamruns`]: teamruns + (val !== 'W' ? val : 0),
         [`${Key}/Totalteamwickets`]: teamwickets + (val === 'W' ? 1 : 0),
         [`${Key}/Totalteamovers`]: Teamovers + (newBowlerBalls === 6 ? 1 : 0),
+
+        // ✅ New section for current striker & non-striker
+        [`Current/`]: {
+          innings:innings,
+          striker: striker,
+          nonstriker: nonstriker,
+          bowler:bowler,
+          teamname: innings===1?hostteam:visitteam
+        },
+
         [`${Key}/Over/${bowler}/${bowlerovers}`]: updatedOver,
+
         [`${Key}/batsmen/${striker}`]: {
           runs: strikerruns + (tag ? (val !== 'W' ? val : 0) : 0),
           balls: strikerballs + (tag ? 1 : 0),
           fours: strikerfours + (tag && val === 4 ? 1 : 0),
           sixes: strikersixes + (tag && val === 6 ? 1 : 0)
         },
+
         [`${Key}/batsmen/${nonstriker}`]: {
           runs: nonstrikerruns + (!tag ? (val !== 'W' ? val : 0) : 0),
           balls: nonstrikerballs + (!tag ? 1 : 0),
           fours: nonstrikerfours + (!tag && val === 4 ? 1 : 0),
           sixes: nonstrikersixes + (!tag && val === 6 ? 1 : 0)
         },
+
         [`${Key}/bowlers/${bowler}`]: {
           runs: bowlerruns + (val !== 'W' ? val : 0),
           overs: bowlerovers + (newBowlerBalls === 6 ? 1 : 0),
@@ -180,7 +190,8 @@ export default function Scorecard() {
           wickets: bowlerwickets,
           maidens: bowlermaiden
         }
-      }
+      };
+
       firebaserealtimedb
         .ref(matchid)
         .update(updates)
@@ -328,134 +339,144 @@ export default function Scorecard() {
 
   return (
     <div className="container-fluid">
-      <div className='row justify-content-center'>
+      <div className="row justify-content-center">
 
-        <div className='shadow-lg p-3 mb-3 rounded col-md-9' style={{ backgroundColor: 'rgb(182, 172, 171)' }}>
-          <div style={{ display: 'flex', alignItems: 'center' }}>
-            <h3 style={{ marginRight: '30px' }}>{innings === 1 ? hostteam : visitteam}</h3>
-            <h3>{teamruns}</h3><h2>-</h2><h3>{teamwickets}</h3><h2>(</h2><h3>{Teamovers}</h3><h1>.</h1><h3>{bowlerballs}</h3><h2>)</h2>
-            <h3 style={{ marginLeft: '130px' }}>{'Innings '}{innings}</h3>
+        <div className="col-12 col-lg-9 mb-3">
+          <div className="p-3 shadow-lg rounded" style={{ backgroundColor: 'rgb(182, 172, 171)' }}>
+            <div className="row align-items-center text-center text-md-start gy-2">
 
-            {innings === 1 && (
-              <h3 style={{ marginLeft: '60px' }}>CRR:&nbsp;
-                {(() => {
-                  const ballsBowled = Teamovers * 6 + bowlerballs;
-                  if (ballsBowled === 0) return '0.00';
-                  const oversBowled = ballsBowled / 6;
-                  return (teamruns / oversBowled).toFixed(2);
-                })()}
-              </h3>
-            )}
-            {innings === 2 && (
-              <h3 style={{ marginLeft: '60px' }}>
-                target {targetruns + 1}
-              </h3>
-            )}
-            <h3 style={{ marginLeft: '30px' }}>Total Over:{overs}</h3>
-            <div className="d-flex justify-content-center align-items-center ml-3">
-              <h2 style={{ marginLeft: '50px' }}>{hostteam}</h2>
-              <h3 style={{ marginLeft: ' 10px' }}>vs</h3>
-              <h2 style={{ marginLeft: ' 10px' }}>{visitteam}</h2>
+              <div className="col-6 col-md-4">
+                <h3 className="mb-1" >
+                  {innings === 1 ? hostteam : visitteam}
+                </h3>
+                <h5 className="mb-0" >
+                  <strong>{teamruns}–{teamwickets}</strong> &nbsp;
+                  ({Teamovers}.{bowlerballs})
+                </h5>
+              </div>
+
+              {/* Innings / CRR or Target */}
+              <div className="col-6 col-md-4">
+                <h3 className="mb-1" >
+                  Innings {innings}
+                </h3>
+                {innings === 1 ? (
+                  <h5 className="mb-0" >
+                    CRR:&nbsp;
+                    {(() => {
+                      const balls = Teamovers * 6 + bowlerballs;
+                      return balls ? (teamruns / (balls / 6)).toFixed(2) : '0.00';
+                    })()}
+                  </h5>
+                ) : (
+                  <h5 className="mb-0" >
+                    Target: {targetruns + 1}
+                  </h5>
+                )}
+              </div>
+
+              {/* Overs / Teams */}
+              <div className="col-12 col-md-4 text-md-end">
+                <h4 className="mb-1" >Overs: {overs}</h4>
+                <h5>  {hostteam} vs {visitteam} </h5>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        <div className="col-12 col-lg-7 mb-3">
+          <div className="p-3 shadow-lg rounded" style={{ backgroundColor: '#fff', color: '#000' }}>
+
+            <div className="table-responsive mb-3">
+              <table className="table table-sm mb-0">
+                <thead >
+                  <tr>
+                    <th>Batsman</th><th>R</th><th>B</th><th>4s</th><th>6s</th><th>SR</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {[
+                    { name: striker, runs: strikerruns, balls: strikerballs, fours: strikerfours, sixes: strikersixes },
+                    { name: nonstriker, runs: nonstrikerruns, balls: nonstrikerballs, fours: nonstrikerfours, sixes: nonstrikersixes }
+                  ].map((p, idx) => (
+                    <tr key={idx} className={idx === (tag ? 0 : 1) ? "table-success" : ""}>
+                      <td ><h5>{p.name}</h5></td>
+                      <td >{p.runs}</td>
+                      <td >{p.balls}</td>
+                      <td >{p.fours}</td>
+                      <td >{p.sixes}</td>
+                      <td >
+                        {p.balls ? ((p.runs / p.balls) * 100).toFixed(2) : '0.00'}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
 
+            <div className="table-responsive">
+              <table className="table table-sm mb-0">
+                <thead >
+                  <tr>
+                    <th>Bowler</th><th>O</th><th>M</th><th>R</th><th>W</th><th>E</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td > <h5> {bowler}</h5></td>
+                    <td >{bowlerovers}.{bowlerballs}</td>
+                    <td >{bowlermaiden}</td>
+                    <td >{bowlerruns}</td>
+                    <td >{bowlerwickets}</td>
+                    <td >
+                      {(bowlerovers * 6 + bowlerballs)
+                        ? (bowlerruns / (bowlerovers + bowlerballs / 6)).toFixed(2)
+                        : '0.00'}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
 
           </div>
-
         </div>
 
-        <div className='shadow-lg p-3 mb-3 bg-white rounded col-md-7'>
-          <table className="table">
-            <thead>
-              <tr>
-                <th>Batsman</th>
-                <th>R</th>
-                <th>B</th>
-                <th>4s</th>
-                <th>6s</th>
-                <th>SR</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td style={{ backgroundColor: tag ? 'chartreuse' : 'transparent', fontWeight: 'bold' }}>
-                  {striker}
-                </td>
-                <td>{strikerruns}</td>
-                <td>{strikerballs}</td>
-                <td>{strikerfours}</td>
-                <td>{strikersixes}</td>
-                <td>{strikerballs ? ((strikerruns / strikerballs) * 100).toFixed(2) : '0.00'}</td>
-              </tr>
-              <tr>
-                <td style={{ backgroundColor: !tag ? 'chartreuse' : 'transparent', fontWeight: 'bold' }}>
-                  {nonstriker}</td>
-                <td>{nonstrikerruns}</td>
-                <td>{nonstrikerballs}</td>
-                <td>{nonstrikerfours}</td>
-                <td>{nonstrikersixes}</td>
-                <td>{nonstrikerballs ? ((nonstrikerruns / nonstrikerballs) * 100).toFixed(2) : '0.00'}</td>
-              </tr>
-            </tbody>
-          </table>
-
-          <table className="table">
-            <thead>
-              <tr>
-                <th>Bowler</th>
-                <th>O</th>
-                <th>M</th>
-                <th>R</th>
-                <th>W</th>
-                <th>E</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>{bowler}</td>
-                <td>{bowlerovers}{'.'}{bowlerballs}</td>
-                <td>{bowlermaiden}</td>
-                <td>{bowlerruns}</td>
-                <td>{bowlerwickets}</td>
-                <td>{(bowlerballs || bowlerovers) > 0 ? (bowlerruns / (bowlerovers + bowlerballs / 6)).toFixed(2) : '0.00'}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <div className='shadow-lg p-3 mb-3 rounded col-md-7' style={{ backgroundColor: 'chartreuse' }}>
-          <div style={{ display: 'flex', alignItems: 'center', backgroundColor: 'chartreuse' }}>
-            <h5 style={{ marginRight: '10px' }}>This Over:</h5>
-            <div style={{ display: 'flex', gap: '10px', fontSize: '20px' }}>
-              {thisover.map((b, idx) => (
-                <span key={idx} className="badge bg-success">{b}</span>
+        <div className="col-12 col-lg-7 mb-3">
+          <div className="p-3 shadow-lg rounded mb-3" style={{ backgroundColor: 'chartreuse', color: '#000' }}>
+            <h3 className="mb-2">This Over:</h3>
+            <div className="d-flex flex-wrap gap-2">
+              {thisover.map((b, i) => (
+                <span key={i} className="badge bg-light text-dark"> <h6>{b} </h6></span>
               ))}
             </div>
           </div>
 
-        </div>
-        <div className='shadow-lg p-3 mb-3 rounded col-md-7' style={{ backgroundColor: 'rgb(182, 172, 171)' }}>
-          <Stack direction="row" spacing={4}>
-            {OPTIONS.map(opt => (
-              <FormControlLabel
-                key={opt.key}
-                control={
-                  <Checkbox
-                    checked={selected.includes(opt.key)}
-                    onChange={() => updateextraruns(opt.key)}
+
+          <div className="p-3 shadow-lg rounded gap-3" style={{ backgroundColor: 'rgb(182, 172, 171)' }}>
+            <div className="d-flex flex-wrap gap-3 mb-3 ps-5">
+              {OPTIONS.map(opt => (
+                <div key={opt.key} className="form-check">
+                  <input type="checkbox" id={opt.key} className="form-check-input" checked={selected.includes(opt.key)}
+                    onChange={() => updateextraruns(opt.key)} style={{fontSize:'20px'}}
                   />
-                }
-                label={opt.label}
-              />
-            ))}
-          </Stack> <br />
-          <input type="button" className="btn btn-primary me-2" value="0" onClick={() => updatescore(0)} />
-          <input type="button" className="btn btn-primary me-2" value="1" onClick={() => updatescore(1)} />
-          <input type="button" className="btn btn-primary me-2" value="2" onClick={() => updatescore(2)} />
-          <input type="button" className="btn btn-primary me-2" value="3" onClick={() => updatescore(3)} />
-          <input type="button" className="btn btn-primary me-2" value="4" onClick={() => updatescore(4)} />
-          <input type="button" className="btn btn-primary me-2" value="6" onClick={() => updatescore(6)} />
-          <input type="button" className='btn btn-primary me-2' value="SwapBatsman" onClick={() => swapbatsman()} />
+                  <label htmlFor={opt.key} className="form-check-label" style={{fontSize:'17px'}}>{opt.label}</label>
+                </div>
+              ))}
+            </div>
+
+            {/* Score Buttons */}
+            <div className="d-flex flex-wrap gap-3 ps-5">
+              {[0, 1, 2, 3, 4, 6].map(val => (
+                <button key={val} className="btn btn-primary" onClick={() => updatescore(val)}>{val}</button>
+              ))}
+              <button className="btn btn-warning" onClick={swapbatsman}>Swap Batsman </button>
+            </div>
+          </div>
         </div>
+
       </div>
     </div>
+
   );
 }
