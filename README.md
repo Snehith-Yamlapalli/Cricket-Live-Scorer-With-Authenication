@@ -19,5 +19,5 @@ Open https://cricket-live-score-rosy.vercel.app/livescore/FirstBattingTeamNamevs
 Open https://cricket-live-score-rosy.vercel.app/livescoreCard/FirstBattingTeamNamevsSecondBattingTeamName  (Edit the Team Names)
 
 ## For example Match between IND and AUS (Suppose IND is batting in first)
-Open https://cricket-live-score-rosy.vercel.app/livescoreCard/INDvsAUS    for Full ScoreCard \
-Open https://cricket-live-score-rosy.vercel.app/livescore/INDvsAUS    for Live Score Updates
+Open https://cricket-live-score-beta.vercel.app/livescoreCard/INDvsAUS    for Full ScoreCard \
+Open https://cricket-live-score-beta.vercel.app/livescore/INDvsAUS    for Live Score Updates
