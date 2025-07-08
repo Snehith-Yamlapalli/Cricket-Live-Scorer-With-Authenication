@@ -1,211 +1,143 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import firebase from './firebase';
+import { useNavigate } from 'react-router-dom';
 
 export default function LiveScore() {
+  const navigate = useNavigate();
+  const firebaserealtimedb = firebase.database()
   const { matchId } = useParams();
   const [matchData, setMatchData] = useState(null);
+  const [strikerruns, setstrikerruns] = useState()
+  const [strikerballs, setstrikerballs] = useState()
+  const [nonstrikeruns, setnonstrikeruns] = useState()
+  const [nonstrikerballs, setnonstrikerballs] = useState()
+  const [bowlerballs, setbowlerballs] = useState()
+  const [bowlerruns, setbowlerruns] = useState()
+  const [bowlerover, setbowlerovers] = useState()
+  const [bowlerwickets, setbowlerwickets] = useState()
+  const [teamscore, setteamscore] = useState()
+  const [teamwickets, setteamwickets] = useState()
+  const [teamovers, setteamovers] = useState()
 
   useEffect(() => {
     if (!matchId) return;
+
     const dbRef = firebase.database().ref(matchId);
-    const listener = dbRef.on('value', snap => setMatchData(snap.val()));
+    const listener = dbRef.on('value', snap => {
+      setMatchData(snap.val());
+    });
     return () => dbRef.off('value', listener);
   }, [matchId]);
+
+  useEffect(() => {
+    if (!matchData || !matchData.Current || !matchId) return;
+
+    const { innings, striker, nonstriker, bowler } = matchData.Current;
+
+    firebase.database().ref(`${matchId}/Innings${innings}`)
+      .once('value')
+      .then(snap => {
+        const d = snap.val();
+        if (d) {
+          const strikerData = d.batsmen?.[striker] || {};
+          const nonStrikerData = d.batsmen?.[nonstriker] || {};
+          const bowlerData = d.bowlers?.[bowler] || {};
+
+          setteamovers(d.Totalteamovers || 0)
+          setteamscore(d.Totalteamruns || 0)
+          setteamwickets(d.Totalteamwickets || 0)
+          setstrikerruns(strikerData.runs || 0);
+          setstrikerballs(strikerData.balls || 0);
+          setnonstrikeruns(nonStrikerData.runs || 0);
+          setnonstrikerballs(nonStrikerData.balls || 0);
+          setbowlerruns(bowlerData.runs || 0);
+          setbowlerballs(bowlerData.balls || 0);
+          setbowlerovers(bowlerData.overs || 0);
+          setbowlerwickets(bowlerData.wickets || 0);
+        }
+      });
+  }, [matchData, matchId]);
+
+
 
   if (!matchData) return <div>Loading live score for {matchId}…</div>;
 
   const {
-  INFO     = {},
-  Innings1 = {},
-  Innings2 = null
-} = matchData;
+    INFO = {},
+    Current = {},
+    Innings1 = {},
+    Innings2 = null
+  } = matchData;
 
-// grab only the Over node from each innings
-const Over1 = Innings1.Over || {};
-const Over2 = (Innings2 && Innings2.Over) || {};
+  // grab only the Over node from each innings
+  const Over1 = Innings1.Over || {};
+  const Over2 = (Innings2 && Innings2.Over) || {};
+  const current = Innings2?.Current || Innings1?.Current || {};
 
+  function gotoHome() { navigate('/Home'); }
+  function gotoScoreCard() { navigate(`/livescoreCard/${matchId}`); }
 
   return (
-    <div className="container my-4">
-      <h1 className="mb-3">Match: {INFO.MatchBetween || matchId}</h1>
-      <p><strong>Toss:</strong> {INFO.TossWinner} chose to {INFO.ChooseTo}</p>
-      <p><strong>Overs per side:</strong> {INFO.NoOfOvers}</p>
 
-      <hr />
+    <div className="container my-4 position-relative">
 
-      {/* Innings 1 Summary */}
-      <h2 className="mt-4">Innings 1</h2>
-      <table className="table table-sm">
-        <thead>
-          <tr>
-            <th>Team Score</th>
-            <th>Runs</th><th>Wickets</th><th>Overs</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>{INFO.MatchBetween.split(' vs ')[0]}</td>
-            <td>{Innings1.Totalteamruns ?? 0}</td>
-            <td>{Innings1.Totalteamwickets ?? 0}</td>
-            <td>{Innings1.Totalteamovers ?? 0}</td>
-          </tr>
-        </tbody>
-      </table>
+  {/* Header & Home Button (unchanged) */}
+  <h1 className="mb-3">Match: {INFO.MatchBetween || matchId}</h1>
+  <h4><strong>Toss:</strong> {INFO.TossWinner} chose to {INFO.ChooseTo}</h4>
+  <h4><strong>Overs per side:</strong> {INFO.NoOfOvers}</h4>
 
-      {/* Innings 1 Batsmen */}
-      <h4>Batsmen</h4>
-      <table className="table table-striped table-sm">
-        <thead>
-          <tr>
-            <th>Name</th><th>Runs</th><th>Balls</th><th>4s</th><th>6s</th>
-          </tr>
-        </thead>
-        <tbody>
-          {Innings1.batsmen && Object.entries(Innings1.batsmen).map(([name, s]) => (
-            <tr key={name}>
-              <td>{name}</td>
-              <td>{s.runs}</td>
-              <td>{s.balls}</td>
-              <td>{s.fours}</td>
-              <td>{s.sixes}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+  <hr />
 
-      {/* Innings 1 Bowlers */}
-      <h4>Bowlers</h4>
-      <table className="table table-striped table-sm">
-        <thead>
-          <tr>
-            <th>Name</th><th>Overs</th><th>Runs</th><th>Wkts</th><th>Maidens</th>
-          </tr>
-        </thead>
-        <tbody>
-          {Innings1.bowlers && Object.entries(Innings1.bowlers).map(([name, s]) => (
-            <tr key={name}>
-              <td>{name}</td>
-              <td>{s.overs}</td>
-              <td>{s.runs}</td>
-              <td>{s.wickets}</td>
-              <td>{s.maidens}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-      {Object.keys(Over1).length === 0 ? (
-        <p>No overs bowled yet in Innings 1.</p>
-      ) : (
-        Object.entries(Over1).map(([bowlerName, oversObj]) => (
-          <div key={`i1-${bowlerName}`} className="mb-4">
-            <h5>Bowler: {bowlerName}</h5>
-            <table className="table table-bordered table-sm">
-              <thead>
-                <tr><th>Over #</th><th>Balls</th></tr>
-              </thead>
-              <tbody>
-                {Object.entries(oversObj).map(([idx, balls]) => (
-                  <tr key={`i1-${bowlerName}-${idx}`}>
-                    <td>{Number(idx) + 1}</td>
-                    <td>{balls.join(' ')}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        ))
-      )}
+  <hr />
 
-
-      {Innings2 && (
-        <>
-          <hr />
-
-          {/* Innings 2 Summary */}
-          <h2 className="mt-4">Innings 2</h2>
-          <table className="table table-sm">
-            <thead>
-              <tr>
-                <th>Team Score</th>
-                <th>Runs</th><th>Wickets</th><th>Overs</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>{INFO.MatchBetween.split(' vs ')[1]}</td>
-                <td>{Innings2.Totalteamruns ?? 0}</td>
-                <td>{Innings2.Totalteamwickets ?? 0}</td>
-                <td>{Innings2.Totalteamovers ?? 0}</td>
-              </tr>
-            </tbody>
-          </table>
-
-          {/* Innings 2 Batsmen */}
-          <h4>Batsmen</h4>
-          <table className="table table-striped table-sm">
-            <thead>
-              <tr>
-                <th>Name</th><th>Runs</th><th>Balls</th><th>4s</th><th>6s</th>
-              </tr>
-            </thead>
-            <tbody>
-              {Innings2.batsmen && Object.entries(Innings2.batsmen).map(([name, s]) => (
-                <tr key={name}>
-                  <td>{name}</td>
-                  <td>{s.runs}</td>
-                  <td>{s.balls}</td>
-                  <td>{s.fours}</td>
-                  <td>{s.sixes}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-
-          {/* Innings 2 Bowlers */}
-          <h4>Bowlers</h4>
-          <table className="table table-striped table-sm">
-            <thead>
-              <tr>
-                <th>Name</th><th>Overs</th><th>Runs</th><th>Wkts</th><th>Maidens</th>
-              </tr>
-            </thead>
-            <tbody>
-              {Innings2.bowlers && Object.entries(Innings2.bowlers).map(([name, s]) => (
-                <tr key={name}>
-                  <td>{name}</td>
-                  <td>{s.overs}</td>
-                  <td>{s.runs}</td>
-                  <td>{s.wickets}</td>
-                  <td>{s.maidens}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </>
-      )}
-      {Object.keys(Over2).length === 0 ? (
-        <p>No overs bowled yet in Innings 1.</p>
-      ) : (
-        Object.entries(Over2).map(([bowlerName, oversObj]) => (
-          <div key={`i1-${bowlerName}`} className="mb-4">
-            <h5>Bowler: {bowlerName}</h5>
-            <table className="table table-bordered table-sm">
-              <thead>
-                <tr><th>Over #</th><th>Balls</th></tr>
-              </thead>
-              <tbody>
-                {Object.entries(oversObj).map(([idx, balls]) => (
-                  <tr key={`i1-${bowlerName}-${idx}`}>
-                    <td>{Number(idx) + 1}</td>
-                    <td>{balls.join(' ')}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        ))
-      )}
+  <div className="text-white p-3 rounded mb-4" style={{ backgroundColor: 'rgb(19, 148, 213)' }}>
+    <div className="row justify-content-center">
+      <div className="col-12 col-md-3 text-center">
+        <h2 className="mb-1">Innings</h2>
+        <h3 className="mb-0">{Current.innings}</h3>
+      </div>
+      <div className="col-12 col-md-3 text-center">
+        <h2 className="mb-1">Team</h2>
+        <h3 className="mb-0">{Current.teamname}</h3>
+      </div>
+      <div className="col-12 col-md-3 text-center">
+        <h2 className="mb-1">Score</h2>
+        <h3 className="mb-0">
+          {teamscore}–{teamwickets} ({teamovers}.{bowlerballs})
+        </h3>
+      </div>
     </div>
+  </div>
+
+  {/* Striker / Non‑Striker / Bowler */}
+  <div className="row justify-content-center text-center gy-4 mb-4 rounded" style={{ backgroundColor: 'rgb(202, 198, 198)' }}>
+    <div className="col-12 col-md-3">
+      <h2 className="mb-1">Striker</h2>
+      <h3>
+        {Current.striker} – {strikerruns} ({strikerballs})
+      </h3>
+    </div>
+    <div className="col-12 col-md-3">
+      <h2 className="mb-1">Non‑Striker</h2>
+      <h3>
+        {Current.nonstriker} – {nonstrikeruns} ({nonstrikerballs})
+      </h3>
+    </div>
+    <div className="col-12 col-md-3">
+      <h2 className="mb-1">Bowler</h2>
+      <h3>
+        {Current.bowler} – {bowlerruns} wkts – {bowlerover}.{bowlerballs} overs
+      </h3>
+    </div>
+  </div>
+
+ 
+    <button className="btn btn-primary m-3" onClick={gotoScoreCard}>Go To Full Score Card</button>
+    <button className="btn btn-primary mt-2 mt-md-0" onClick={gotoHome}>
+      Home
+    </button>
+</div>
+
   );
 }
