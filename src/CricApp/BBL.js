@@ -11,6 +11,11 @@ export default function BBL() {
   const navigate = useNavigate();
 
   function Startmatch() {
+    if(!striker || !nonstriker || !bowler)
+    {
+      alert('Enter all required Names')
+      return;
+    }
     navigate('/scorecard', {
       state: { innings, hostteam, visitteam, overs, striker, nonstriker, bowler }
     });
