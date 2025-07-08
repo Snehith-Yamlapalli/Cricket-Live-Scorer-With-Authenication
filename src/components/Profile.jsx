@@ -31,16 +31,27 @@ const Home = () => {
   return (
     <div>
       {userDetails ? (
-        <div className="col-md-12 bg-warning d-flex p-3 mb-3 " style={{ gap: '250px' }}>
-          <h2>Welcome</h2>
-          <div>
-            <p style={{ position: 'absolute', left: '20px', top: '50px' }}>Email: {userDetails.email}</p>
-          </div>
-          <h1>Cric App</h1>
-          <button className="btn btn-primary" onClick={logout} style={{ marginLeft: '350px' }}>
-            Logout
-          </button>
-        </div>
+       <div className="container-fluid">
+  <div className="row bg-warning p-3 mb-3 align-items-center justify-content-between">
+    
+    <div className="col-6 col-md-auto">
+      <h2 className="mb-0">Welcome</h2>
+      <p className="mb-0" style={{ fontSize: '14px' }}>Email: {userDetails.email}</p>
+    </div>
+
+    <div className="col-12 col-md-auto text-center mt-3 mt-md-0">
+      <h1 className="mb-0">Cric App</h1>
+    </div>
+
+    <div className="col-12 col-md-auto text-end mt-3 mt-md-0">
+      <button className="btn btn-primary" onClick={logout}>
+        Logout
+      </button>
+    </div>
+
+  </div>
+</div>
+
       ) : (
         <p>Loading...</p>
       )}
