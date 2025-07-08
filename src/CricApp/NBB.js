@@ -48,29 +48,36 @@ export default function NBB() {
   }
 
   return (
-    <div className='row justify-content-center'>
-      <div id='teams' className='row justify-content-center '>
-        <div className='col-md-4' style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <input type="text" className="form-control" value={hostteam} readOnly placeholder="Host name" />
-          <span>Vs</span>
-          <input type="text" className="form-control" value={visitteam} readOnly placeholder="Visit name" />
-        </div>
-      </div>
-
-      <div className="col-md-4 mt-2">
-        <div style={{ display: 'flex', alignItems: 'center', gap: '150px' }}>
-          <div><h1>New Batman</h1></div>
-          <div><h3>{innings === 1 ? hostteam : visitteam}</h3></div>
-        </div>
-        <input type="text" className="form-control" placeholder="Striker name" value={tag ? newstriker : (striker || '')} readOnly={!tag} required={tag} onChange={(e) => setnewstriker(e.target.value)} />
-        <input type="text" className="form-control" placeholder="Non-striker name" value={tag ? (nonstriker || '') : newnonstriker} readOnly={tag} required={!tag} onChange={(e) => setnewnonstriker(e.target.value)} />
-        <div style={{ display: 'flex', alignItems: 'center', gap: '150px' }}>
-          <div><h1>Bowler</h1></div>
-          <div><h3>{innings === 2 ? hostteam : visitteam}</h3></div>
-        </div>
-            <input type="text" className='form-control' placeholder='Bowler name' value={bowler} onChange={(e) => setnewbowler(e.target.value)} required />         <input type="button" className="btn btn-primary" value="Done" onClick={Startmatch} />
-      </div>
+     <div className="col-md-6 mt-4 mx-auto">
+  <div style={{ backgroundColor: 'rgb(182, 172, 171)' }} className="p-4 rounded shadow">
+    <div className="text-center mb-3">
+      <h1>New Batsman</h1>
+      <h3>{innings === 1 ? hostteam : visitteam}</h3>
     </div>
+
+    <input type="text" className="form-control mb-2" placeholder="Striker name"
+      value={tag ? newstriker : (striker || '')}
+      readOnly={!tag} required={tag}
+      onChange={(e) => setnewstriker(e.target.value)} />
+
+    <input type="text" className="form-control mb-4" placeholder="Non-striker name"
+      value={tag ? (nonstriker || '') : newnonstriker}
+      readOnly={tag} required={!tag}
+      onChange={(e) => setnewnonstriker(e.target.value)} />
+
+    <div className="text-center mb-3">
+      <h1>Bowler</h1>
+      <h3>{innings === 2 ? hostteam : visitteam}</h3>
+    </div>
+
+    <input type="text" className="form-control mb-3" placeholder="Bowler name"
+      value={bowler}
+      onChange={(e) => setnewbowler(e.target.value)} required />
+
+    <input type="button" className="btn btn-primary w-100" value="Done" onClick={Startmatch} />
+  </div>
+</div>
+
   );
 }
 
